@@ -1,14 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import RecipeList from "./recipeList";
 import "../css/app.css";
 import uuidv4 from "uuid/v4";
-import Recipe from "./recipe";
 
 export const RecipeContext = React.createContext();
+const LOCAL_STORAGE_KEY = "cookingWithReact.recipes";
 
 function App() {
   const [recipes, setRecipes] = useState(sampleRecipes);
   const recipeContextValue = { handleRecipeAdd, handleRecipeDelete };
+
+  ///the order of the useEffect hooks matters!
+  ///also, the next hook is checking to see if there were recipes in the storages
+  ///and if there are then they are being parsed into an array and into the setRecipes function.
+  useEffect(() => {
+    const recipeJSON = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (recipeJSON != null) setRecipes(JSON.parse(recipeJSON));
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(recipes));
+  }, [recipes]);
 
   function handleRecipeAdd() {
     const newRecipe = {
